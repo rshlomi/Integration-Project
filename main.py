@@ -3,7 +3,6 @@
 
 # TODO
 # max_input outside of NN
-# properly verify inputs
 # Properly format output
 # higher order polynomial
 
@@ -39,37 +38,50 @@ class Net(nn.Module):  # Thanks to some help from my brother Tom
         return vector
 
 
-def synthetic_target(x):
+def synthetic_target(x, a, b, c):
     """Provides numbers for output"""
-    global a, b, c
     return a * x ** 2 + b * x + c
-
 
 def request_input():
     """Asking for user input to the neural network"""
     global a, b, c, training_iterations, lines_to_print, number_to_test
     print("Create a quadratic function")
-    a = float(input("Pick the coefficient of the squared term"))
-    b = input("Pick the coefficient of the linear term")
-    c = input("Pick the intercept")
+    while not isinstance(a, float):
+        try:
+            a = float(input("Pick the coefficient of the squared term"))
+        except:
+            print("Please make sure to enter a number!")
+            a = "error"
+    while not isinstance(b, float):
+        try:
+            b = float(input("Pick the coefficient of the linear term"))
+        except:
+            print("Please make sure to enter a number!")
+            b = "error"
+    c = "intentional error"
+    while not isinstance(c, float):
+        try:
+            c = float(input("Pick the intercept"))
+        except:
+            print("Please make sure to enter a number!")
+            c = "error"
+
     training_iterations = int(input("How many iterations would you like?"))
     lines_to_print = int(input("How many lines would you like to see at the "
                                "beginning and at the end of training?"))
     number_to_test = max_input / 2  # later, let user decide
 
 
-def verify_input():
+def verify_input(training_iterations):
     """Veryfing if user input is large enough"""
-    global training_iterations
     if training_iterations < 1:
         training_iterations = 100
     else:
         pass
 
 
-def train_network(iterations=100, lines=20):
+def train_network(max_input, iterations=100, lines=20):
     """Training the network"""
-    global max_input
     for i in range(training_iterations):
 
         # Draw random number to seed output
@@ -78,7 +90,7 @@ def train_network(iterations=100, lines=20):
         # Convert to tensor for pytorch usage
         sample = torch.tensor(sample).float()
 
-        actual_output = synthetic_target(sample)
+        actual_output = synthetic_target(sample, a, b, c)
         predicted_output = net(sample)
         loss = loss_function(predicted_output, actual_output)
 
@@ -95,33 +107,34 @@ def train_network(iterations=100, lines=20):
 
 # Instantiates a Net
 net = Net()
-loss_function = nn.MSELoss()  # Squared error loss
+
+# Squared error loss
+loss_function = nn.MSELoss()
 
 # Stochastic grad descent
 optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
 
 
-def test_network(number_to_test):
+def test_network(number_to_test, net):
     """Using a test value, compares predicted to actual value"""
-    global net
     number_to_test = np.random.rand(1, 1) * max_input  # Draw random number to seed output
     number_to_test = torch.tensor(number_to_test).float()
-    actual = synthetic_target(number_to_test)
+    actual = synthetic_target(number_to_test, a, b, c)
     predicted = net(number_to_test)
-    actual_float = synthetic_target(number_to_test).item()
+    actual_float = synthetic_target(number_to_test, a, b, c).item()
     predicted_float = net(number_to_test).item()
 
     # print them both, print difference (absolute and percentage)
-    print(f"Actual is {round(synthetic_target(number_to_test).item(), 2)}",
+    print(f"Actual is {round(synthetic_target(number_to_test, a, b, c).item(), 2)}",
           f"Predicted is {round(net(number_to_test).item(), 2)}")
     print(f"Absolute difference is: {round(predicted_float - actual_float, 2)}")
-    percent_diff = 100 * abs(predicted_float) / abs(actual_float + predicted_float)
+    percent_diff = abs(predicted_float) / abs(actual_float + predicted_float)
     print(f"Percent difference is: {round(percent_diff, 2)}" + "%")
 
-
+# Now that all functions have been defined, let's run them
 request_input()
-verify_input()
-
-train_network(training_iterations, lines_to_print)
-test_network(number_to_test)  # compare network output with polynomial value.
-
+verify_input(training_iterations)
+print("Input verified")
+print("-" * 79)
+train_network(max_input, training_iterations, lines_to_print)
+test_network(number_to_test, net)  # compare network output with polynomial value.
