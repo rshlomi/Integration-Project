@@ -10,6 +10,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as f
+import matplotlib.pyplot as plt
 
 # Initialize variables
 a, b, c = 5, 0, 0  # polynomial coefficients
@@ -79,6 +80,9 @@ def verify_input(training_iterations):
     else:
         pass
 
+def present_equation(a, b, c):
+    """Prints the equation"""
+    print(f"Your equation is: {a}x^2 + {b}x + {c}")
 
 def train_network(max_input, iterations=100, lines=20):
     """Training the network"""
@@ -105,23 +109,6 @@ def train_network(max_input, iterations=100, lines=20):
         loss.backward()  # Finds the derivative of the loss in all the parameters
         optimizer.step()  # gradient descent
 
-
-# Instantiates a Net
-net = Net()
-
-# Squared error loss
-loss_function = nn.MSELoss()
-
-# Stochastic grad descent
-optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
-
-def plot_loss(losses):
-    """Plots the loss over time"""
-    import matplotlib.pyplot as plt
-    plt.plot(losses)
-    plt.show()
-
-
 def test_network(number_to_test, net):
     """Using a test value, compares predicted to actual value"""
     number_to_test = np.random.rand(1, 1) * max_input  # Draw random number to seed output
@@ -138,10 +125,29 @@ def test_network(number_to_test, net):
     percent_diff = abs(predicted_float) / abs(actual_float + predicted_float)
     print(f"Percent difference is: {round(percent_diff, 2)}" + "%")
 
+def plot_loss(losses):
+    """Plots the loss over time"""
+    plt.plot(losses)
+    plt.show()
+
+
+# Instantiates a Net
+net = Net()
+
+# Squared error loss
+loss_function = nn.MSELoss()
+
+# Stochastic grad descent
+optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
+
+
+
+
 # Now that all functions have been defined, let's run them
 request_input()
 verify_input(training_iterations)
 print("Input verified")
+present_equation(a, b, c)
 print("-" * 79)
 train_network(max_input, training_iterations, lines_to_print)
 test_network(number_to_test, net)  # compare network output with polynomial value.
