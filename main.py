@@ -17,7 +17,7 @@ training_iterations = 100
 lines_to_print = 10
 number_to_test = 0.5
 max_input = 1
-
+losses = list()
 
 class Net(nn.Module):  # Thanks to some help from my brother Tom
     def __init__(self):
@@ -93,6 +93,7 @@ def train_network(max_input, iterations=100, lines=20):
         actual_output = synthetic_target(sample, a, b, c)
         predicted_output = net(sample)
         loss = loss_function(predicted_output, actual_output)
+        losses.append(loss.item())
 
         # print first and last iterations
         if i < lines_to_print or i > training_iterations - lines_to_print:
@@ -113,6 +114,12 @@ loss_function = nn.MSELoss()
 
 # Stochastic grad descent
 optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
+
+def plot_loss(losses):
+    """Plots the loss over time"""
+    import matplotlib.pyplot as plt
+    plt.plot(losses)
+    plt.show()
 
 
 def test_network(number_to_test, net):
@@ -138,3 +145,4 @@ print("Input verified")
 print("-" * 79)
 train_network(max_input, training_iterations, lines_to_print)
 test_network(number_to_test, net)  # compare network output with polynomial value.
+plot_loss(losses)

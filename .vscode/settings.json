@@ -1,0 +1,5 @@
+{
+    "terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\cmd.exe",
+    "terminal.integrated.shellArgs.windows": ["/K", "C:\\Users\\Shahar\\Anaconda3\\Scripts\\activate.bat C:\\Users\\Shahar\\Anaconda3"],
+    "python.condaPath": "C:\\Users\\Shahar\\Anaconda3\\Scripts\\conda.exe"
+}
