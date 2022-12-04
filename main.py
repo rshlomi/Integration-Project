@@ -52,20 +52,17 @@ def request_input():
             a = float(input("Pick the coefficient of the squared term"))
         except:
             print("Please make sure to enter a number!")
-            a = "error"
     while not isinstance(b, float):
         try:
             b = float(input("Pick the coefficient of the linear term"))
         except:
             print("Please make sure to enter a number!")
-            b = "error"
     c = "intentional error"
     while not isinstance(c, float):
         try:
             c = float(input("Pick the intercept"))
         except:
             print("Please make sure to enter a number!")
-            c = "error"
 
     training_iterations = int(input("How many iterations would you like?"))
     lines_to_print = int(input("How many lines would you like to see at the "
