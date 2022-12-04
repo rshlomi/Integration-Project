@@ -1,10 +1,12 @@
 # Ron Shlomi
-# Artificial Neural Network
+# Artificial Neural Network - Quadratic Function
 
 # TODO
 # max_input outside of NN
 # Properly format output
 # higher order polynomial
+# plot actual vs predicted across whole 0-1 range
+# user-determined number of layers
 
 import numpy as np
 import torch
@@ -19,14 +21,19 @@ lines_to_print = 10
 number_to_test = 0.5
 max_input = 1
 losses = list()
+hidden_neurons = list()
+hidden_neurons.append(10)
 
-class Net(nn.Module):  # Thanks to some help from my brother Tom
+class Net(nn.Module):
     def __init__(self):
         """Initializing the network"""
         super(Net, self).__init__()
-        layer1_neurons = 10
-        self.input_layer = nn.Linear(1, layer1_neurons)  # 1 by 10 matrix
-        self.hidden_layer = nn.Linear(layer1_neurons, 10)  # 10 by 10 matrix
+        input_neurons = 10
+        self.input_layer = nn.Linear(1, input_neurons)  # 1 by 10 matrix
+        #self.hidden_layer = nn.Linear(layer1_neurons, 10)  # 10 by 10 matrix
+        for neuron in hidden_neurons:
+            self.hidden_layer = nn.Linear(input_neurons, neuron)
+            input_neurons = neuron
         self.output_layer = nn.Linear(10, 1)  # 10 by 1 matrix
 
     def forward(self, vector):
