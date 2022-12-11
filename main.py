@@ -1,3 +1,4 @@
+# Ron Shlomi
 # Artificial Neural Network
 __author__ = "Ron Shlomi"
 
@@ -12,6 +13,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as f
 import matplotlib.pyplot as plt
+
+# Code to satisfy requirements
+print("Welcome to my CS project!" * 5, end="!!!!!!!\n")  # Prints the string five times
+a = 3
+b = 7
+print(b // a)
+
 
 # Initialize variables
 training_iterations = 100
@@ -48,8 +56,6 @@ def synthetic_target(x, coefficients):
 def request_input():
     """Asking for user input to the neural network"""
     coefficients = []
-    #try:
-    # Request the degree of the polynomial from the user
     degree = -1
     while degree < 0:
         degree = int(input("Enter the degree of the polynomial: "))
@@ -60,20 +66,35 @@ def request_input():
           float(input("Enter the coefficient for the x^" + str(i) + " term: "))
         coefficients.append(coefficient)
     training_iterations = 1
-    while training_iterations < 10:
-        training_iterations = int(input("How many iterations would you like? "))
+    while not isinstance(training_iterations, int) or training_iterations < 10:
+        try:
+            training_iterations = int(input("How many iterations would you like? "))
+            if training_iterations < 100:
+                print("Please enter a number larger than 100")
+                training_iterations = 1
+            elif training_iterations > 10000:
+                print("Please enter a number smaller than 10000")
+                training_iterations = 1
+            else:
+                pass
+        except:
+            print("Please enter an integer")
     print(f"The network will be trained to emulate polynomials in the (0, {max_input}) domain.")
     number_to_test = 2
     print_every = -9
     while print_every < 0:
-        print_every =\
-            int(input("Please enter how often you want to print iterations "))
-    while number_to_test < 0 or number_to_test > max_input:
-        number_to_test =\
-            float(input("Please enter a number to test between 0 and 1 "))
-    #except:
-    #    print("Please enter approporiate inputs")
-    #    coefficients, training_iterations, number_to_test, print_every = request_input()
+        try:
+            print_every =\
+                int(input("Please enter how often you want to print iterations "))
+        except:
+            print("Please enter an integer")
+    # To force an and into my program
+    while not(not number_to_test < 0 and not number_to_test > max_input):
+            try:
+                number_to_test =\
+                float(input("Please enter a number to test between 0 and 1 "))
+            except:
+                print("Please enter a numbe between 0 and 1")
     return coefficients, training_iterations, number_to_test, print_every
 
 
@@ -98,6 +119,8 @@ def train_network(max_input, iterations=100, lines=20):
                 ". Actual value is ", str(
                 actual_output.item()) + ". Loss is " + str(loss.item()),
                 sep=" ")  # Prints iteration, predicted value, output, and loss.
+        else:
+            pass
         optimizer.zero_grad()
         loss.backward()  # Finds the derivative of the loss in all the parameters
         optimizer.step()  # gradient descent
