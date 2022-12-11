@@ -4,7 +4,7 @@ __author__ = "Ron Shlomi"
 # TODO
 # max_input outside of [0,1]
 # Properly format output
-# Plot actual and predicted polynomail for 0-1 range
+# Plot actual and predicted polynomial for 0-1 range
 # make code more efficient
 
 import numpy as np
@@ -15,10 +15,8 @@ import matplotlib.pyplot as plt
 
 # Initialize variables
 training_iterations = 100
-print_every = int(input("How often do you want to print the iterations?"))
 max_input = 1
 losses = list()
-coefficients = []
 
 # define class and functions
 class Net(nn.Module):
@@ -49,11 +47,14 @@ def synthetic_target(x, coefficients):
 
 def request_input():
     """Asking for user input to the neural network"""
+    coefficients = []
+    #try:
     # Request the degree of the polynomial from the user
-    degree = int(input("Enter the degree of the polynomial: "))
+    degree = -1
+    while degree < 0:
+        degree = int(input("Enter the degree of the polynomial: "))
 
     # Request the coefficients from the user
-
     for i in range(degree + 1):
         coefficient =\
           float(input("Enter the coefficient for the x^" + str(i) + " term: "))
@@ -63,16 +64,17 @@ def request_input():
         training_iterations = int(input("How many iterations would you like? "))
     print(f"The network will be trained to emulate polynomials in the (0, {max_input}) domain.")
     number_to_test = 2
+    print_every = -9
+    while print_every < 0:
+        print_every =\
+            int(input("Please enter how often you want to print iterations "))
     while number_to_test < 0 or number_to_test > max_input:
         number_to_test =\
             float(input("Please enter a number to test between 0 and 1 "))
-
-    # Pretty print the polynomial using string formatting and list comprehension
-    polynomial_string = " + ".join(
-        [str(coefficients[i]) + "x^" + str(i) for i in range(degree + 1) if coefficients[i] != 0])
-    print("The polynomial is:", polynomial_string)
-
-    return coefficients, training_iterations, number_to_test
+    #except:
+    #    print("Please enter approporiate inputs")
+    #    coefficients, training_iterations, number_to_test, print_every = request_input()
+    return coefficients, training_iterations, number_to_test, print_every
 
 
 def train_network(max_input, iterations=100, lines=20):
@@ -90,12 +92,12 @@ def train_network(max_input, iterations=100, lines=20):
         loss = loss_function(predicted_output, actual_output)
         losses.append(loss.item())
 
-        # print first and last iterations
+        # print_every iteration
         if i % print_every == 0:
             print(str(i), ": Predicted is ", str(predicted_output.item()) +
-                  ". Actual value is ", str(
+                ". Actual value is ", str(
                 actual_output.item()) + ". Loss is " + str(loss.item()),
-                  sep=" ")  # Prints iteration, predicted value, output, and loss.
+                sep=" ")  # Prints iteration, predicted value, output, and loss.
         optimizer.zero_grad()
         loss.backward()  # Finds the derivative of the loss in all the parameters
         optimizer.step()  # gradient descent
@@ -109,22 +111,10 @@ def plot_loss(losses):
     plt.ylabel('Loss')
     plt.show()
 
-
-# Instantiates a Net
-net = Net()
-
-# Squared error loss
-loss_function = nn.MSELoss()
-
-# Stochastic grad descent
-optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
-
-
 def test_network(number_to_test, net):
-    """Using a test value, compares predicted to actual value"""
+    """Using user's test value, compares predicted to actual value"""
     number_to_test = np.array([number_to_test])
     number_to_test = torch.tensor(number_to_test).float()
-    actual = synthetic_target(number_to_test, coefficients)
     predicted = net(number_to_test)
     actual_float = synthetic_target(number_to_test, coefficients).item()
     predicted_float = net(number_to_test).item()
@@ -142,11 +132,22 @@ def test_network(number_to_test, net):
     print(txt3.format(cent_diff=(100 * abs(predicted_float - actual_float)\
                                   / actual_float)))
 
+# Instantiates a Net
+net = Net()
 
-# Now that all functions have been defined, let's run them
-coefficients, training_iterations, number_to_test = request_input()
+# Squared error loss
+loss_function = nn.MSELoss()
+
+# Stochastic grad descent
+optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
+
+coefficients, training_iterations, number_to_test, print_every = request_input()
 print("Input verified")
 print("-" * 79)
 train_network(max_input, training_iterations, print_every)
+# Pretty print the polynomial using string formatting and list comprehension
+polynomial_string = " + ".join([str(coefficients[i]) + "x^" + str(i) \
+                    for i in range(len(coefficients)) if coefficients[i] != 0])
+print("The polynomial is:", polynomial_string)
 test_network(number_to_test, net)  # compare network output with polynomial value.
 plot_loss(losses)
